@@ -26,9 +26,9 @@ button{margin-top:8px;padding:13px 22px;border:1px solid #cdb7a7;
 </head>
 <body>
 <main>
- <div class="eyebrow">A LITTLE COLLECTION</div>
+ <div class="eyebrow"></div>
  <h1>маленькие моменты ♡</h1>
- <p>иногда хочется сохранить что-то простое</p>
+ <p></p>
  <div class="frame">
   <img id="photo" alt="Маленькое воспоминание">
  </div>
@@ -53,7 +53,7 @@ async function loadPhotos(){
    /\.(jpe?g|png|webp|gif)$/i.test(f.name))
    .map(f=>f.download_url);
   if(!photos.length){
-   caption.textContent='Пока нет фотографий — добавь их в папку photos ♡';
+   caption.textContent='';
    return;
   }
   showRandom();
