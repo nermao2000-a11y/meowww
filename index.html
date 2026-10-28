@@ -58,7 +58,7 @@ async function loadPhotos(){
   }
   showRandom();
  }catch(e){
-  caption.textContent='Не удалось загрузить фото. Проверь папку photos.';
+  caption.textContent='ой что соучилось';
  }
 }
 function showRandom(){
@@ -68,7 +68,7 @@ function showRandom(){
  previous=n;
  document.getElementById('photo').src=photos[n];
  document.getElementById('caption').textContent=
-  'одно маленькое воспоминание ♡';
+  'млем';
 }
 loadPhotos();
 </script>
