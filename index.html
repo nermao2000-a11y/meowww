@@ -5,71 +5,163 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#f7f1e8">
-<title>мяуууууууу♡</title>
+<title>маленькие моменты ♡</title>
+
 <style>
 *{box-sizing:border-box}
+
 body{
- margin:0;min-height:100vh;padding:28px 16px;
- display:flex;align-items:center;justify-content:center;
- background:#f7f1e8;color:#443a34;text-align:center;
+ margin:0;
+ min-height:100vh;
+ padding:28px 16px;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ background:#f7f1e8;
+ color:#443a34;
+ text-align:center;
  font-family:Georgia,serif
 }
+
 main{width:100%;max-width:520px}
-.eyebrow{font:11px Arial,sans-serif;letter-spacing:3px;color:#8b7c70}
-h1{font-weight:400;font-size:clamp(28px,7vw,40px);margin:14px 0}
+
+.eyebrow{
+ font:11px Arial,sans-serif;
+ letter-spacing:3px;
+ color:#8b7c70
+}
+
+h1{
+ font-weight:400;
+ font-size:clamp(28px,7vw,40px);
+ margin:14px 0
+}
+
 p{color:#8b7c70}
-.frame{padding:9px;border:1px solid #e7d9cc;background:#fff9f2}
-img{width:100%;max-height:65vh;object-fit:contain;display:block}
-button{margin-top:8px;padding:13px 22px;border:1px solid #cdb7a7;
- border-radius:30px;background:transparent;color:#443a34;font-size:14px}
+
+.frame{
+ padding:9px;
+ border:1px solid #e7d9cc;
+ background:#fff9f2
+}
+
+img{
+ width:100%;
+ max-height:65vh;
+ object-fit:contain;
+ display:block
+}
+
+button{
+ margin-top:8px;
+ padding:13px 22px;
+ border:1px solid #cdb7a7;
+ border-radius:30px;
+ background:transparent;
+ color:#443a34;
+ font-size:14px
+}
 </style>
 </head>
+
 <body>
 <main>
- <div class="eyebrow"></div>
- <h1>мяуууууууу</h1>
- <p></p>
+ <div class="eyebrow">A LITTLE COLLECTION</div>
+
+ <h1>маленькие моменты ♡</h1>
+
+ <p>иногда хочется сохранить что-то простое</p>
+
  <div class="frame">
-  <img id="photo" alt="муррррр">
+  <img id="photo" alt="Маленькое воспоминание">
  </div>
- <p id="caption">загружmeow…</p>
- <button onclick="showRandom()">ищоооооооо</button>
+
+ <p id="caption">загружаю воспоминания…</p>
+
+ <button onclick="showRandom()">
+  ещё одно воспоминание ♡
+ </button>
 </main>
+
 <script>
 const parts=location.pathname.split('/').filter(Boolean);
 const owner=location.hostname.split('.')[0];
 const repo=parts[0]||'';
-let photos=[],previous=-1;
 
+let photos=[];
+let deck=[];
+let lastPhoto=null;
+
+// Загружаем фотографии из папки photos
 async function loadPhotos(){
  const caption=document.getElementById('caption');
+
  try{
   const response=await fetch(
    `https://api.github.com/repos/${owner}/${repo}/contents/photos`
   );
+
   if(!response.ok) throw new Error();
+
   const files=await response.json();
-  photos=files.filter(f=>f.type==='file'&&
-   /\.(jpe?g|png|webp|gif)$/i.test(f.name))
+
+  photos=files
+   .filter(f=>f.type==='file'&&
+    /\.(jpe?g|png|webp|gif)$/i.test(f.name))
    .map(f=>f.download_url);
+
   if(!photos.length){
-   caption.textContent='';
+   caption.textContent=
+    'Пока нет фотографий — добавь их в папку photos ♡';
    return;
   }
+
   showRandom();
+
  }catch(e){
-  caption.textContent='ой что соучилось';
+  caption.textContent=
+   'Не удалось загрузить фото. Проверь папку photos.';
  }
 }
+
+// Перемешиваем весь список фотографий
+function shufflePhotos(){
+ deck=[...photos];
+
+ for(let i=deck.length-1;i>0;i--){
+  const j=Math.floor(Math.random()*(i+1));
+  [deck[i],deck[j]]=[deck[j],deck[i]];
+ }
+
+ // Не допускаем повторения на границе циклов
+ if(
+  deck.length>1&&
+  deck[deck.length-1]===lastPhoto
+ ){
+  [deck[0],deck[deck.length-1]]=
+  [deck[deck.length-1],deck[0]];
+ }
+}
+
+// Показываем следующую фотографию
 function showRandom(){
  if(!photos.length)return;
- let n=Math.floor(Math.random()*photos.length);
- if(photos.length>1&&n===previous)n=(n+1)%photos.length;
- previous=n;
- document.getElementById('photo').src=photos[n];
+
+ // Когда фотографии заканчиваются,
+ // создаём новый случайный порядок
+ if(!deck.length){
+  shufflePhotos();
+ }
+
+ const next=deck.pop();
+ lastPhoto=next;
+
+ document.getElementById('photo').src=next;
+
  document.getElementById('caption').textContent=
-  'млем';
+  'одно маленькое воспоминание ♡';
 }
+
 loadPhotos();
 </script>
 </body>
