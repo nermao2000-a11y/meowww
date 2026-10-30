@@ -25,12 +25,6 @@ body{
 
 main{width:100%;max-width:520px}
 
-.eyebrow{
- font:11px Arial,sans-serif;
- letter-spacing:3px;
- color:#8b7c70
-}
-
 h1{
  font-weight:400;
  font-size:clamp(28px,7vw,40px);
@@ -42,14 +36,18 @@ p{color:#8b7c70}
 .frame{
  padding:9px;
  border:1px solid #e7d9cc;
- background:#fff9f2
+ background:#fff9f2;
+ min-height:150px;
+ display:flex;
+ align-items:center;
+ justify-content:center
 }
 
 img{
  width:100%;
  max-height:65vh;
  object-fit:contain;
- display:block
+ display:none
 }
 
 button{
@@ -66,7 +64,6 @@ button{
 
 <body>
 <main>
- <div class="eyebrow"></div>
 
  <h1>такие милые котеке(˵♡ᴗ♡˵)</h1>
 
@@ -74,6 +71,7 @@ button{
 
  <div class="frame">
   <img id="photo" alt="хехехехехе">
+  <p id="status">загружаю котиков ♡</p>
  </div>
 
  <p id="caption"></p>
@@ -81,50 +79,55 @@ button{
  <button onclick="showRandom()">
   ищоооооооо
  </button>
+
 </main>
 
 <script>
-const parts=location.pathname.split('/').filter(Boolean);
 const owner=location.hostname.split('.')[0];
-const repo=parts[0]||'';
+const repo=location.pathname.split('/').filter(Boolean)[0]||'';
 
 let photos=[];
 let deck=[];
 let lastPhoto=null;
+let loading=false;
 
-// Загружаем фотографии из папки photos
+// Получаем фотографии из GitHub
 async function loadPhotos(){
- const caption=document.getElementById('caption');
+ const status=document.getElementById('status');
 
  try{
   const response=await fetch(
-   `https://api.github.com/repos/${owner}/${repo}/contents/photos`
+   `https://api.github.com/repos/${owner}/${repo}/contents/photos`,
+   {cache:'no-store'}
   );
 
-  if(!response.ok) throw new Error();
+  if(!response.ok){
+   throw new Error('GitHub API: '+response.status);
+  }
 
   const files=await response.json();
 
   photos=files
    .filter(f=>f.type==='file'&&
     /\.(jpe?g|png|webp|gif)$/i.test(f.name))
-   .map(f=>f.download_url);
+   .map(f=>f.download_url)
+   .filter(Boolean);
 
   if(!photos.length){
-   caption.textContent=
-    '';
+   status.textContent='Пока нет фотографий ♡';
    return;
   }
 
+  status.style.display='none';
   showRandom();
 
- }catch(e){
-  caption.textContent=
-   '';
+ }catch(error){
+  console.error(error);
+  status.textContent='Не удалось загрузить фотографии ♡';
  }
 }
 
-// Перемешиваем весь список фотографий
+// Перемешивание без повторений
 function shufflePhotos(){
  deck=[...photos];
 
@@ -133,36 +136,66 @@ function shufflePhotos(){
   [deck[i],deck[j]]=[deck[j],deck[i]];
  }
 
- // Не допускаем повторения на границе циклов
- if(
-  deck.length>1&&
-  deck[deck.length-1]===lastPhoto
- ){
+ // Не допускаем повтора между циклами
+ if(deck.length>1&&deck[deck.length-1]===lastPhoto){
   [deck[0],deck[deck.length-1]]=
   [deck[deck.length-1],deck[0]];
  }
 }
 
 // Показываем следующую фотографию
-function showRandom(){
- if(!photos.length)return;
+async function showRandom(){
+ if(loading||!photos.length)return;
 
- // Когда фотографии заканчиваются,
- // создаём новый случайный порядок
- if(!deck.length){
-  shufflePhotos();
+ loading=true;
+
+ const img=document.getElementById('photo');
+ const status=document.getElementById('status');
+ const caption=document.getElementById('caption');
+
+ img.style.display='none';
+ status.style.display='block';
+ status.textContent='ищем котиков ♡';
+
+ while(photos.length){
+  if(!deck.length){
+   shufflePhotos();
+  }
+
+  const next=deck.pop();
+
+  try{
+   await new Promise((resolve,reject)=>{
+    img.onload=resolve;
+    img.onerror=reject;
+    img.src=next;
+   });
+
+   lastPhoto=next;
+   img.style.display='block';
+   status.style.display='none';
+   caption.textContent='мурррррррррррррррррр♡';
+
+   loading=false;
+   return;
+
+  }catch(error){
+   console.warn('ой:',next);
+
+   photos=photos.filter(photo=>photo!==next);
+   deck=deck.filter(photo=>photo!==next);
+  }
  }
 
- const next=deck.pop();
- lastPhoto=next;
+ status.style.display='block';
+ status.textContent='блен чет не то';
+ caption.textContent='';
 
- document.getElementById('photo').src=next;
-
- document.getElementById('caption').textContent=
-  'мурррррррррррррррррр♡';
+ loading=false;
 }
 
 loadPhotos();
 </script>
+
 </body>
 </html>
