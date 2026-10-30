@@ -66,20 +66,20 @@ button{
 
 <body>
 <main>
- <div class="eyebrow">A LITTLE COLLECTION</div>
+ <div class="eyebrow"></div>
 
  <h1>такие милые котеке(˵♡ᴗ♡˵)</h1>
 
- <p>иногда хочется сохранить что-то простое</p>
+ <p>мяумяумяумяумяуууууууу</p>
 
  <div class="frame">
-  <img id="photo" alt="Маленькое воспоминание">
+  <img id="photo" alt="хехехехехе">
  </div>
 
- <p id="caption">загружаю воспоминания…</p>
+ <p id="caption"></p>
 
  <button onclick="showRandom()">
-  ещё одно воспоминание ♡
+  ищоооооооо
  </button>
 </main>
 
@@ -112,7 +112,7 @@ async function loadPhotos(){
 
   if(!photos.length){
    caption.textContent=
-    'Пока нет фотографий — добавь их в папку photos ♡';
+    '';
    return;
   }
 
@@ -120,7 +120,7 @@ async function loadPhotos(){
 
  }catch(e){
   caption.textContent=
-   'Не удалось загрузить фото. Проверь папку photos.';
+   '';
  }
 }
 
@@ -159,7 +159,7 @@ function showRandom(){
  document.getElementById('photo').src=next;
 
  document.getElementById('caption').textContent=
-  'одно маленькое воспоминание ♡';
+  'мурррррррррррррррррр♡';
 }
 
 loadPhotos();
